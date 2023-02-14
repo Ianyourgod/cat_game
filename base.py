@@ -5,11 +5,13 @@ PLAYER = [0,0]
 OBJECTS = []
 
 class Object:
-    def __init__(self, x, y, width, height, color: tuple|None =None, image: str|None =None) -> None:
+    def __init__(self, x, y, width, height, color: tuple|None =None, image: str|None = None, collision: bool = True) -> None:
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+
+        self.collision = collision
 
         self.color = None
         self.image = None
@@ -32,10 +34,10 @@ class Object:
             win.blit(self.image, (self.x, self.y))
 
     def collide(self, obj) -> bool:
-        if self.x + self.width > obj.x and self.x < obj.x + obj.width:
-            if self.y + self.height > obj.y and self.y < obj.y + obj.height:
-                print(self.x, obj.x)
-                return True
+        if self.collision and obj.collision:
+            if self.x + self.width > obj.x and self.x < obj.x + obj.width:
+                if self.y + self.height > obj.y and self.y < obj.y + obj.height:
+                    return True
         return False
 
 
@@ -57,57 +59,61 @@ class Cat(Object):
         self.NW_I = pygame.transform.scale(pygame.image.load(NW_I).convert_alpha(), (width, height))
 
     def move(self, direction: str) -> None:
-        if direction == "N":
-            self.y -= self.speed
-            self.image = self.N_I
-        elif direction == "NE":
-            self.x += self.speed
-            self.y -= self.speed
-            self.image = self.NE_I
-        elif direction == "E":
-            self.x += self.speed
-            self.image = self.E_I
-        elif direction == "SE":
-            self.x += self.speed
-            self.y += self.speed
-            self.image = self.SE_I
-        elif direction == "S":
-            self.y += self.speed
-            self.image = self.S_I
-        elif direction == "SW":
-            self.x -= self.speed
-            self.y += self.speed
-            self.image = self.SW_I
-        elif direction == "W":
-            self.x -= self.speed
-            self.image = self.W_I
-        elif direction == "NW":
-            self.x -= self.speed
-            self.y -= self.speed
-            self.image = self.NW_I
-        for obj in OBJECTS:
-            if obj != self:
-                if self.collide(obj):
-                    if direction == "N":
-                        self.y += self.speed
-                    elif direction == "NE":
-                        self.x -= self.speed
-                        self.y += self.speed
-                    elif direction == "E":
-                        self.x -= self.speed
-                    elif direction == "SE":
-                        self.x -= self.speed
-                        self.y -= self.speed
-                    elif direction == "S":
-                        self.y -= self.speed
-                    elif direction == "SW":
-                        self.x += self.speed
-                        self.y -= self.speed
-                    elif direction == "W":
-                        self.x += self.speed
-                    elif direction == "NW":
-                        self.x += self.speed
-                        self.y += self.speed
+        if direction == "N" or direction == "NE" or direction == "NW":
+            if direction == "N":
+                self.y -= self.speed
+                self.image = self.N_I
+            elif direction == "NE":
+                self.y -= self.speed
+                self.image = self.NE_I
+            elif direction == "NW":
+                self.y -= self.speed
+                self.image = self.NW_I
+            for i in OBJECTS:
+                if self.collide(i) and i != self:
+                    self.y += self.speed
+                    break
+        if direction == "S" or direction == "SE" or direction == "SW":
+            if direction == "S":
+                self.y += self.speed
+                self.image = self.S_I
+            elif direction == "SE":
+                self.y += self.speed
+                self.image = self.SE_I
+            elif direction == "SW":
+                self.y += self.speed
+                self.image = self.SW_I
+            for i in OBJECTS:
+                if self.collide(i) and i != self:
+                    self.y -= self.speed
+                    break
+        if direction == "E" or direction == "NE" or direction == "SE":
+            if direction == "E":
+                self.x += self.speed
+                self.image = self.E_I
+            elif direction == "NE":
+                self.x += self.speed
+                self.image = self.NE_I
+            elif direction == "SE":
+                self.x += self.speed
+                self.image = self.SE_I
+            for i in OBJECTS:
+                if self.collide(i) and i != self:
+                    self.x -= self.speed
+                    break
+        if direction == "W" or direction == "NW" or direction == "SW":
+            if direction == "W":
+                self.x -= self.speed
+                self.image = self.W_I
+            elif direction == "NW":
+                self.x -= self.speed
+                self.image = self.NW_I
+            elif direction == "SW":
+                self.x -= self.speed
+                self.image = self.SW_I
+            for i in OBJECTS:
+                if self.collide(i) and i != self:
+                    self.x += self.speed
                     break
 
 
