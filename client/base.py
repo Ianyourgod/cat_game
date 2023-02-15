@@ -31,7 +31,7 @@ class Object:
         if self.color:
             pygame.draw.rect(win, self.color, (self.x-PLAYER[0], self.y-PLAYER[1], self.width, self.height))
         elif self.image:
-            win.blit(self.image, (self.x, self.y))
+            win.blit(self.image, (self.x-PLAYER[0], self.y-PLAYER[1]))
 
     def collide(self, obj) -> bool:
         if self.collision and obj.collision:
@@ -39,6 +39,9 @@ class Object:
                 if self.y + self.height > obj.y and self.y < obj.y + obj.height:
                     return True
         return False
+
+    def draw_hitbox(self, win: pygame.Surface) -> None:
+        pygame.draw.rect(win, (230, 230, 230), (self.x-PLAYER[0], self.y-PLAYER[1], self.width, self.height), 2)
 
 
 class Cat(Object):
@@ -58,16 +61,19 @@ class Cat(Object):
         self.W_I = pygame.transform.scale(pygame.image.load(W_I).convert_alpha(), (width, height))
         self.NW_I = pygame.transform.scale(pygame.image.load(NW_I).convert_alpha(), (width, height))
 
+        self.direction = "N"
+
     def move(self, direction: str) -> None:
+        self.direction = direction
         if direction == "N" or direction == "NE" or direction == "NW":
             if direction == "N":
                 self.y -= self.speed
                 self.image = self.N_I
             elif direction == "NE":
-                self.y -= self.speed
+                self.y -= self.speed/2
                 self.image = self.NE_I
             elif direction == "NW":
-                self.y -= self.speed
+                self.y -= self.speed/2
                 self.image = self.NW_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
@@ -78,10 +84,10 @@ class Cat(Object):
                 self.y += self.speed
                 self.image = self.S_I
             elif direction == "SE":
-                self.y += self.speed
+                self.y += self.speed/2
                 self.image = self.SE_I
             elif direction == "SW":
-                self.y += self.speed
+                self.y += self.speed/2
                 self.image = self.SW_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
@@ -92,10 +98,10 @@ class Cat(Object):
                 self.x += self.speed
                 self.image = self.E_I
             elif direction == "NE":
-                self.x += self.speed
+                self.x += self.speed/2
                 self.image = self.NE_I
             elif direction == "SE":
-                self.x += self.speed
+                self.x += self.speed/2
                 self.image = self.SE_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
@@ -106,10 +112,10 @@ class Cat(Object):
                 self.x -= self.speed
                 self.image = self.W_I
             elif direction == "NW":
-                self.x -= self.speed
+                self.x -= self.speed/2
                 self.image = self.NW_I
             elif direction == "SW":
-                self.x -= self.speed
+                self.x -= self.speed/2
                 self.image = self.SW_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
