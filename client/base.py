@@ -1,15 +1,24 @@
 import pygame
 
+def null():
+    return
+
 PLAYER = [0,0]
+
+BUTTONS = []
 
 OBJECTS = []
 
+TEXTBOXES = []
+
 class Object:
-    def __init__(self, x, y, width, height, color: tuple|None =None, image: str|None = None, collision: bool = True) -> None:
+    def __init__(self, x, y, width, height, color: tuple|None =None, image: str|None = None, collision: bool = True, visible=True) -> None:
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+
+        self.visible = visible
 
         self.collision = collision
 
@@ -28,10 +37,11 @@ class Object:
         OBJECTS.append(self)
 
     def draw(self, win: pygame.Surface) -> None:
-        if self.color:
-            pygame.draw.rect(win, self.color, (self.x-PLAYER[0], self.y-PLAYER[1], self.width, self.height))
-        elif self.image:
-            win.blit(self.image, (self.x-PLAYER[0], self.y-PLAYER[1]))
+        if self.visible:
+            if self.color:
+                pygame.draw.rect(win, self.color, (self.x-PLAYER[0], self.y-PLAYER[1], self.width, self.height))
+            elif self.image:
+                win.blit(self.image, (self.x-PLAYER[0], self.y-PLAYER[1]))
 
     def collide(self, obj) -> bool:
         if self.collision and obj.collision:
@@ -41,7 +51,8 @@ class Object:
         return False
 
     def draw_hitbox(self, win: pygame.Surface) -> None:
-        pygame.draw.rect(win, (230, 230, 230), (self.x-PLAYER[0], self.y-PLAYER[1], self.width, self.height), 2)
+        if self.collision:
+            pygame.draw.rect(win, (230, 230, 230), (self.x-PLAYER[0], self.y-PLAYER[1], self.width, self.height), 2)
 
 
 class Cat(Object):
@@ -63,63 +74,64 @@ class Cat(Object):
 
         self.direction = "N"
 
-    def move(self, direction: str) -> None:
+    def move(self, direction: str, milli: int|float) -> None:
         self.direction = direction
+        speed = self.speed * (milli/16)
         if direction == "N" or direction == "NE" or direction == "NW":
             if direction == "N":
-                self.y -= self.speed
+                self.y -= speed
                 self.image = self.N_I
             elif direction == "NE":
-                self.y -= self.speed/2
+                self.y -= speed/2
                 self.image = self.NE_I
             elif direction == "NW":
-                self.y -= self.speed/2
+                self.y -= speed/2
                 self.image = self.NW_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
-                    self.y += self.speed
+                    self.y += speed
                     break
         if direction == "S" or direction == "SE" or direction == "SW":
             if direction == "S":
-                self.y += self.speed
+                self.y += speed
                 self.image = self.S_I
             elif direction == "SE":
-                self.y += self.speed/2
+                self.y += speed/2
                 self.image = self.SE_I
             elif direction == "SW":
-                self.y += self.speed/2
+                self.y += speed/2
                 self.image = self.SW_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
-                    self.y -= self.speed
+                    self.y -= speed
                     break
         if direction == "E" or direction == "NE" or direction == "SE":
             if direction == "E":
-                self.x += self.speed
+                self.x += speed
                 self.image = self.E_I
             elif direction == "NE":
-                self.x += self.speed/2
+                self.x += speed/2
                 self.image = self.NE_I
             elif direction == "SE":
-                self.x += self.speed/2
+                self.x += speed/2
                 self.image = self.SE_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
-                    self.x -= self.speed
+                    self.x -= speed
                     break
         if direction == "W" or direction == "NW" or direction == "SW":
             if direction == "W":
-                self.x -= self.speed
+                self.x -= speed
                 self.image = self.W_I
             elif direction == "NW":
-                self.x -= self.speed/2
+                self.x -= speed/2
                 self.image = self.NW_I
             elif direction == "SW":
-                self.x -= self.speed/2
+                self.x -= speed/2
                 self.image = self.SW_I
             for i in OBJECTS:
                 if self.collide(i) and i != self:
-                    self.x += self.speed
+                    self.x += speed
                     break
 
 
@@ -127,10 +139,111 @@ class Player(Cat):
     def __init__(self, win: pygame.Surface, width, height, speed: float|int, N_I: str, NE_I: str, E_I: str, SE_I: str, S_I: str, SW_I: str, W_I: str, NW_I: str) -> None:
         super().__init__(win.get_width()//2-width/2, win.get_height()//2-height/2, width, height, speed, N_I, NE_I, E_I, SE_I, S_I, SW_I, W_I, NW_I)
         self.extra = [win.get_width()//2-width/2, win.get_height()//2-height/2]
-    def move(self, direction: str) -> None:
-        super().move(direction)
+    def move(self, direction: str, milli: int|float) -> None:
+        super().move(direction, milli)
         PLAYER[0] = self.x - self.extra[0]
         PLAYER[1] = self.y - self.extra[1]
 
     def draw(self, win: pygame.Surface) -> None:
         win.blit(self.image, (win.get_width()//2-self.width/2, win.get_height()//2-self.height/2))
+        
+        
+class Button(Object):
+    def __init__(self, x, y, width, height, text: str, text_size: int, text_color: tuple, font:pygame.font.Font, color: tuple | None = None, image: str | None = None, visible: bool = True, click = null, clickable:bool=True) -> None:
+        super().__init__(x, y, width, height, color, image, False, visible)
+        self.text = text
+        self.text_size = text_size
+        self.text_color = text_color
+        self.font = font
+        self.click = click
+        self.clickable = clickable
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        BUTTONS.append(self)
+
+    def draw(self, win: pygame.Surface) -> None:
+        if not self.visible:
+            return
+        if self.color:
+            pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
+        if self.image:
+            win.blit(self.image, (self.x, self.y))
+        text = self.font.render(self.text, True, self.text_color)
+        win.blit(text, (self.x+self.width/2-text.get_width()/2, self.y+self.height/2-text.get_height()/2))
+        
+        
+class Text(Object):
+    def __init__(self, x, y, text: str, text_size: int, text_color: tuple, font:pygame.font.Font, color: tuple | None = None, image: str | None = None, visible: bool = True) -> None:
+        super().__init__(x, y, 0, 0, color, image, False, visible)
+        self.text = text
+        self.text_size = text_size
+        self.text_color = text_color
+        self.font = font
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def draw(self, win: pygame.Surface) -> None:
+        if not self.visible:
+            return
+        if self.color:
+            pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
+        if self.image:
+            win.blit(self.image, (self.x, self.y))
+        text = self.font.render(self.text, True, self.text_color)
+        win.blit(text, (self.x, self.y))
+        
+
+class Textbox(Object):
+    def __init__(self, x: int|float, y: int|float, width: int|float, height: int|float, text_color: tuple, font: pygame.font.Font, placeholder: str = "", unselected_color: tuple = None, selected_color: tuple=None, unselected_image: str | None = None, selected_image: str | None = None, image: str|None = None, visible: bool = True) -> None:
+        super().__init__(x, y, width, height, unselected_color, image, False, visible)
+        self.text_color = text_color
+        self.font = font
+        self.placeholder = placeholder
+        self.unselected_color = unselected_color
+        self.selected_color = selected_color
+        self.unselected_image = unselected_image
+        self.selected_image = selected_image
+        self.text = ""
+        self.selected = False
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        TEXTBOXES.append(self)
+    
+    def draw(self, win: pygame.Surface):
+        if not self.visible:
+            return
+        if self.selected:
+            if self.selected_color:
+                pygame.draw.rect(win, self.selected_color, (self.x, self.y, self.width, self.height))
+            if self.selected_image:
+                win.blit(self.selected_image, (self.x, self.y))
+            if self.image:
+                win.blit(self.image, (self.x, self.y))
+        else:
+            if self.unselected_color:
+                pygame.draw.rect(win, self.unselected_color, (self.x, self.y, self.width, self.height))
+            if self.unselected_image:
+                win.blit(self.unselected_image, (self.x, self.y))
+            if self.image:
+                win.blit(self.image, (self.x, self.y))
+        if self.text == "" and not self.selected:
+            text = self.font.render(self.placeholder, True, self.text_color)
+        else:
+            text = self.font.render(self.text, True, self.text_color)
+        win.blit(text, (self.x+self.width/2-text.get_width()/2, self.y+self.height/2-text.get_height()/2))
+    
+    def keypress(self, event):
+        if self.selected:
+            if event.key == pygame.K_BACKSPACE:
+                self.text = self.text[:-1]
+                return
+            if event.key == pygame.K_RETURN:
+                self.selected = False
+                return
+            if event.key == pygame.K_TAB:
+                self.selected = False
+                return
+            if event.key == pygame.K_ESCAPE:
+                self.selected = False
+                return
+            if event.key == pygame.K_ESCAPE:
+                self.selected = False
+                return
+            self.text += event.unicode
