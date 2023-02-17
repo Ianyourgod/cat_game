@@ -18,7 +18,8 @@ def join():
                 return jsonify({'success': False, 'message': 'Username already taken.'})
             i['players'].append({'username': username, 'x': 0, 'y': 0, 'direction': 'N'})
             return jsonify({'success': True, 'message': 'Joined room.'})
-        
+    print(room)
+    return jsonify({'success': False, 'message': 'Room not found.'})
 @app.route('/create', methods=['POST'])
 def create():
     data = request.get_json()

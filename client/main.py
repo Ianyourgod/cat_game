@@ -61,7 +61,7 @@ def create_server_button():
 
         
 def join_server():
-    name = create_name_t.text
+    name = join_name_t.text
     username = username_t.text
     data = requests.post(f"http://{SERVER_IP}:5000/join", json={"name": username, "room": name}).json()
     if data['success']:
