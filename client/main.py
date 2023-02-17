@@ -114,7 +114,7 @@ def update():
         global OTHER_PLAYERS
         OTHER_PLAYERS = data['players']
         for player in OTHER_PLAYERS:
-            if player['name'] == username:
+            if player['username'] == username:
                 OTHER_PLAYERS.remove(player)
                 break
 
@@ -187,6 +187,8 @@ while run:
     elif join_menu:
         text = menu_font.render("Join Server", 1, (255, 255, 255))
         win.blit(text, (SCREEN_SIZE[0]//2-text.get_width()//2, SCREEN_SIZE[1]//2-text.get_height()//2))
+        join_confirm_b.draw(win)
+        join_name_t.draw(win)
     else:
 
         if keys[pygame.K_w] and keys[pygame.K_s]:
