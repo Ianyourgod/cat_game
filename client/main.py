@@ -1,7 +1,7 @@
-# test
 import pygame
 import base
 import requests
+import time
 
 pygame.init()
 
@@ -135,6 +135,7 @@ main_menu_f(True)
 
 player_drawer = base.OtherPlayerDrawer()
 
+prev_time = time.time()
 run = True
 while run:
     milli = clock.tick(FPS)
@@ -213,7 +214,9 @@ while run:
         elif keys[pygame.K_d]:
             cat.move("E", milli)
 
-        update()
+        if prev_time + 0.2 < time.time():
+            update()
+            prev_time = time.time()
 
         for player in OTHER_PLAYERS:
             player_drawer.draw(win, player.x, player.y, player.direction, player.username)
