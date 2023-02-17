@@ -268,21 +268,21 @@ class OtherPlayerDrawer:
 
     def draw(self, win: pygame.Surface, x, y, dir, name):
         if dir == "N":
-            win.blit(self.N_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.N_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "NE":
-            win.blit(self.NE_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.NE_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "E":
-            win.blit(self.E_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.E_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "SE":
-            win.blit(self.SE_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.SE_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "S":
-            win.blit(self.S_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.S_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "SW":
-            win.blit(self.SW_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.SW_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "W":
-            win.blit(self.W_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.W_I, (x-PLAYER[0], y-PLAYER[1]))
         elif dir == "NW":
-            win.blit(self.NW_I, (x+PLAYER[0], y+PLAYER[1]))
+            win.blit(self.NW_I, (x-PLAYER[0], y-PLAYER[1]))
         else:
             raise Exception("Invalid direction")
 
