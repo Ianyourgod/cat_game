@@ -40,7 +40,7 @@ def create_server():
     username = username_t.text
     data = requests.post(f"http://{SERVER_IP}:5000/create", json={"name": username, "room": name}).json()
     if data['success']:
-        global create_menu
+        global create_menu, SERVER_NAME
         create_menu = False
         create_confirm_b.visible = False
         create_confirm_b.clickable = False
@@ -65,14 +65,22 @@ def join_server():
     username = username_t.text
     data = requests.post(f"http://{SERVER_IP}:5000/join", json={"name": username, "room": name}).json()
     if data['success']:
-        global join_menu
+        global join_menu, SERVER_NAME
         join_menu = False
+        join_confirm_b.visible = False
+        join_confirm_b.clickable = False
+        join_name_t.selected = False
+        join_name_t.visible = False
+        join_name_t.text = ""
         SERVER_NAME = name
 def join_server_button():
     global main_menu, join_menu
     main_menu = False
     join_menu = True
     join_server_b.visible = False
+    join_name_t.visible = True
+    join_confirm_b.visible = True
+    join_confirm_b.clickable = True
     create_server_b.visible = False
         
 def leave_server():
@@ -118,6 +126,9 @@ create_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+50, 200, 50,
 create_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=create_server, clickable=False, visible=False)
 
 join_server_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+180, 100, 50, "Join", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server_button)
+join_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+180, 200, 50, (255, 255, 255), menu_font, "Server name...", image="images/textures/stone_button.png", visible=False)
+join_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+250, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server, clickable=False, visible=False)
+
 
 main_menu_f(True)
 
