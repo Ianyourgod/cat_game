@@ -126,8 +126,8 @@ create_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+50, 200, 50,
 create_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=create_server, clickable=False, visible=False)
 
 join_server_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+180, 100, 50, "Join", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server_button)
-join_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+180, 200, 50, (255, 255, 255), menu_font, "Server name...", image="images/textures/stone_button.png", visible=False)
-join_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+250, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server, clickable=False, visible=False)
+join_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+50, 200, 50, (255, 255, 255), menu_font, "Server name...", image="images/textures/stone_button.png", visible=False)
+join_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server, clickable=False, visible=False)
 
 
 main_menu_f(True)
