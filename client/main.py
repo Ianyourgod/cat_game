@@ -166,7 +166,6 @@ while run:
                         box.selected = False
                 for button in base.BUTTONS:
                     if button.rect.collidepoint(pos) and button.clickable:
-                        print(button.clickable)
                         button.click()
 
     keys = pygame.key.get_pressed()
