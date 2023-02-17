@@ -82,6 +82,7 @@ def join_server_button():
     join_confirm_b.visible = True
     join_confirm_b.clickable = True
     create_server_b.visible = False
+    create_confirm_b.clickable = False
         
 def leave_server():
     name = create_name_t.text
