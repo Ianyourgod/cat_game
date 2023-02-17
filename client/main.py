@@ -224,7 +224,7 @@ while run:
             prev_time = time.time()
 
         for player in OTHER_PLAYERS:
-            player_drawer.draw(win, player.x, player.y, player.direction, player.username)
+            player_drawer.draw(win, player['x'], player['y'], player['direction'], player['username'])
 
         for obj in base.OBJECTS:
             obj.draw(win)
