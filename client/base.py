@@ -247,3 +247,44 @@ class Textbox(Object):
                 self.selected = False
                 return
             self.text += event.unicode
+
+
+class OtherPlayerDrawer:
+    def __init__(self):
+        self.font = pygame.font.Font("fonts/Eight-Bit Madness.ttf", 30)
+
+        N_I, NE_I, E_I, SE_I, S_I, SW_I, W_I, NW_I ="images/cat/N_I.png", "images/cat/NE_I.png", "images/cat/E_I.png", "images/cat/SE_I.png", "images/cat/S_I.png", "images/cat/SW_I.png", "images/cat/W_I.png", "images/cat/NW_I.png"
+
+        width, height = 50, 50
+
+        self.N_I = pygame.transform.scale(pygame.image.load(N_I).convert_alpha(), (width, height))
+        self.NE_I = pygame.transform.scale(pygame.image.load(NE_I).convert_alpha(), (width, height))
+        self.E_I = pygame.transform.scale(pygame.image.load(E_I).convert_alpha(), (width, height))
+        self.SE_I = pygame.transform.scale(pygame.image.load(SE_I).convert_alpha(), (width, height))
+        self.S_I = pygame.transform.scale(pygame.image.load(S_I).convert_alpha(), (width, height))
+        self.SW_I = pygame.transform.scale(pygame.image.load(SW_I).convert_alpha(), (width, height))
+        self.W_I = pygame.transform.scale(pygame.image.load(W_I).convert_alpha(), (width, height))
+        self.NW_I = pygame.transform.scale(pygame.image.load(NW_I).convert_alpha(), (width, height))
+
+    def draw(self, win: pygame.Surface, x, y, dir, name):
+        if dir == "N":
+            win.blit(self.N_I, (x, y))
+        elif dir == "NE":
+            win.blit(self.NE_I, (x, y))
+        elif dir == "E":
+            win.blit(self.E_I, (x, y))
+        elif dir == "SE":
+            win.blit(self.SE_I, (x, y))
+        elif dir == "S":
+            win.blit(self.S_I, (x, y))
+        elif dir == "SW":
+            win.blit(self.SW_I, (x, y))
+        elif dir == "W":
+            win.blit(self.W_I, (x, y))
+        elif dir == "NW":
+            win.blit(self.NW_I, (x, y))
+        else:
+            raise Exception("Invalid direction")
+
+        text = self.font.render(name, True, (0, 0, 0))
+        win.blit(text, (x+25-text.get_width()/2, y-30))

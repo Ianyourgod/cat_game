@@ -10,6 +10,7 @@ SCREEN_SIZE = (500, 500)
 VERSION = "0.0.5"
 SERVER_IP = "192.168.2.7"
 SERVER_NAME = ""
+OTHER_PLAYERS = []
 
 win = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Cat Game :3")
@@ -38,7 +39,6 @@ def create_server():
     name = create_name_t.text
     username = username_t.text
     data = requests.post(f"http://{SERVER_IP}:5000/create", json={"name": username, "room": name}).json()
-    print(data)
     if data['success']:
         global create_menu
         create_menu = False
@@ -98,7 +98,17 @@ def main_menu_f(y_n):
     create_confirm_b.visible = False
     create_confirm_b.clickable = False  
     
-#def send_update():
+def update():
+    name = SERVER_NAME
+    username = username_t.text
+    data = requests.post(f"http://{SERVER_IP}:5000/update", json={"name": username, "room": name, "x": cat.x, "y": cat.y, "direction": cat.direction}).json()
+    if data['success']:
+        global OTHER_PLAYERS
+        OTHER_PLAYERS = data['players']
+        for player in OTHER_PLAYERS:
+            if player['name'] == username:
+                OTHER_PLAYERS.remove(player)
+                break
 
     
 username_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+115, 200, 50, (255, 255, 255), menu_font, "Username...", image="images/textures/stone_button.png")
@@ -111,7 +121,7 @@ join_server_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+180, 100, 50, 
 
 main_menu_f(True)
 
-Test = 0
+player_drawer = base.OtherPlayerDrawer()
 
 run = True
 while run:
@@ -160,7 +170,6 @@ while run:
         username_t.draw(win)
     elif create_menu:
         text = menu_font.render("Create Server", 1, (255, 255, 255))
-        Test += 1
         win.blit(text, (SCREEN_SIZE[0]//2-text.get_width()//2, SCREEN_SIZE[1]//2-text.get_height()//2))
         create_confirm_b.draw(win)
         create_name_t.draw(win)
@@ -189,7 +198,11 @@ while run:
             cat.move("W", milli)
         elif keys[pygame.K_d]:
             cat.move("E", milli)
-        
+
+        update()
+
+        for player in OTHER_PLAYERS:
+            player_drawer.draw(win, player.x, player.y, player.direction, player.username)
 
         for obj in base.OBJECTS:
             obj.draw(win)
