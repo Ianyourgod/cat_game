@@ -50,6 +50,7 @@ def create_server():
         SERVER_NAME = name
 
 def create_server_button():
+    print("WHYY")
     global main_menu, create_menu
     main_menu = False
     create_menu = True
@@ -82,7 +83,7 @@ def join_server_button():
     join_confirm_b.visible = True
     join_confirm_b.clickable = True
     create_server_b.visible = False
-    create_confirm_b.clickable = False
+    create_server_b.clickable = False
         
 def leave_server():
     name = create_name_t.text
@@ -161,6 +162,7 @@ while run:
                         box.selected = False
                 for button in base.BUTTONS:
                     if button.rect.collidepoint(pos) and button.clickable:
+                        print(button.text)
                         button.click()
 
     keys = pygame.key.get_pressed()
