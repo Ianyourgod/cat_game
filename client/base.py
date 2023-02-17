@@ -204,8 +204,8 @@ class Textbox(Object):
         self.text = ""
         self.selected = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        OBJECTS.remove(self)
         TEXTBOXES.append(self)
-    
     def draw(self, win: pygame.Surface):
         if not self.visible:
             return

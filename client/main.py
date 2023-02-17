@@ -2,13 +2,14 @@
 import pygame
 import base
 import requests
-import json
 
 pygame.init()
 
 FPS = 1000
 SCREEN_SIZE = (500, 500)
 VERSION = "0.0.5"
+SERVER_IP = "192.168.2.7"
+SERVER_NAME = ""
 
 win = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Cat Game :3")
@@ -36,11 +37,18 @@ menu_font = pygame.font.Font("fonts/Eight-Bit Madness.ttf", 30)
 def create_server():
     name = create_name_t.text
     username = username_t.text
-    data = requests.post("http://localhost:5000/create", json={"name": username, "room": name}).json()
+    data = requests.post(f"http://{SERVER_IP}:5000/create", json={"name": username, "room": name}).json()
+    print(data)
     if data['success']:
         global create_menu
         create_menu = False
         create_confirm_b.visible = False
+        create_confirm_b.clickable = False
+        create_name_t.selected = False
+        create_name_t.visible = False
+        create_name_t.text = ""
+        SERVER_NAME = name
+
 def create_server_button():
     global main_menu, create_menu
     main_menu = False
@@ -55,10 +63,11 @@ def create_server_button():
 def join_server():
     name = create_name_t.text
     username = username_t.text
-    data = requests.post("http://localhost:5000/join", json={"name": username, "room": name}).json()
+    data = requests.post(f"http://{SERVER_IP}:5000/join", json={"name": username, "room": name}).json()
     if data['success']:
         global join_menu
         join_menu = False
+        SERVER_NAME = name
 def join_server_button():
     global main_menu, join_menu
     main_menu = False
@@ -69,7 +78,7 @@ def join_server_button():
 def leave_server():
     name = create_name_t.text
     username = username_t.text
-    data = requests.post("http://localhost:5000/leave", json={"name": username, "room": name}).json()
+    data = requests.post(f"http://{SERVER_IP}:5000/leave", json={"name": username, "room": name}).json()
     if data['success']:
         global main_menu
         main_menu = True
@@ -87,7 +96,10 @@ def main_menu_f(y_n):
     join_menu = False
     create_name_t.text = ""
     create_confirm_b.visible = False
-    create_confirm_b.clickable = False        
+    create_confirm_b.clickable = False  
+    
+#def send_update():
+
     
 username_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+115, 200, 50, (255, 255, 255), menu_font, "Username...", image="images/textures/stone_button.png")
 
@@ -177,6 +189,7 @@ while run:
             cat.move("W", milli)
         elif keys[pygame.K_d]:
             cat.move("E", milli)
+        
 
         for obj in base.OBJECTS:
             obj.draw(win)
