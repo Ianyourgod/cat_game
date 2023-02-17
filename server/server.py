@@ -12,7 +12,6 @@ def join():
     data = request.get_json()
     username = data['name']
     room = data['room']
-    sid = request.sid
     for i in rooms:
         if i['name'] == room:
             if username in [j['username'] for j in i['players']]:
@@ -25,11 +24,10 @@ def create():
     data = request.get_json()
     username = data['name']
     room = data['room']
-    sid = request.sid
     for i in rooms:
         if i['name'] == room:
             return jsonify({'success': False, 'message': 'Room already exists.'})
-    rooms.append({'name': room, 'players': [{'username': username, 'x': 0, 'y': 0, 'direction': 'N'}], 'host': username, 'host_sid': sid, 'started': False})
+    rooms.append({'name': room, 'players': [{'username': username, 'x': 0, 'y': 0, 'direction': 'N'}], 'host': username, 'started': False})
     return jsonify({'success': True, 'message': 'Created room.'})
 
 @app.route('/get_rooms', methods=['GET'])
@@ -41,7 +39,6 @@ def leave():
     data = request.get_json()
     username = data['name']
     room = data['room']
-    sid = request.sid
     for i in rooms:
         if i['name'] == room:
             for j in i['players']:
@@ -55,7 +52,6 @@ def update():
     data = request.get_json()
     username = data['name']
     room = data['room']
-    sid = request.sid
     for i in rooms:
         if i['name'] == room:
             for j in i['players']:
@@ -66,12 +62,11 @@ def update():
                     return jsonify({'success': True, 'message': 'Updated.'})
     return jsonify({'success': False, 'message': 'Room not found.'})
 
-@app.route('get_updates', methods=['POST'])
+@app.route('/get_updates', methods=['POST'])
 def get_updates():
     data = request.get_json()
     username = data['name']
     room = data['room']
-    sid = request.sid
     for i in rooms:
         if i['name'] == room:
             for j in i['players']:
@@ -80,4 +75,4 @@ def get_updates():
     return jsonify({'success': False, 'message': 'Room not found.'})
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=5000, host='0.0.0.0')
