@@ -27,7 +27,7 @@ def create():
     room = data['room']
     for i in rooms:
         if i['name'] == room:
-            return jsonify({'success': False})
+            return jsonify({'success': False, 'message': 'Room already exists.'})
     rooms.append({'name': room, 'players': [{'username': username, 'x': 0, 'y': 0, 'direction': 'N'}], 'host': username, 'started': False})
     return jsonify({'success': True})
 
@@ -61,6 +61,20 @@ def update():
                     j['y'] = data['y']
                     j['direction'] = data['direction']
                     return jsonify({'success': True, 'players': i['players']})
+    return jsonify({'success': False, 'message': 'Room not found.'})
+
+@app.route('/close', methods=['POST'])
+def close():
+    data = request.get_json()
+    username = data['name']
+    room = data['room']
+    for i in rooms:
+        if i['name'] == room:
+            if i['host'] == username:
+                rooms.remove(i)
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'message': 'You are not the host.'})
     return jsonify({'success': False, 'message': 'Room not found.'})
 
 if __name__ == "__main__":

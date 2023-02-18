@@ -2,27 +2,38 @@ import pygame
 import base
 import requests
 import time
+import os
+import socket   
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+
+def resource_path(relative_path):
+    return 'assets/' + relative_path
 
 pygame.init()
 
 FPS = 1000
-SCREEN_SIZE = (500, 500)
+SCREEN_SIZE = (500,500)
 VERSION = "0.0.5"
-SERVER_IP = "192.168.2.7"
+SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER_NAME = ""
 OTHER_PLAYERS = []
+Host = False
 
-win = pygame.display.set_mode(SCREEN_SIZE)
+HOW_MANY_UPDATES_PER_SECOND = 20
+DELAY = 1 / HOW_MANY_UPDATES_PER_SECOND
+
+win = pygame.display.set_mode(SCREEN_SIZE, pygame.RESIZABLE)
 pygame.display.set_caption("Cat Game :3")
 
 clock = pygame.time.Clock()
 
-cat = base.Player(win, 50, 50, 5, "images/cat/N_I.png", "images/cat/NE_I.png", "images/cat/E_I.png", "images/cat/SE_I.png", "images/cat/S_I.png", "images/cat/SW_I.png", "images/cat/W_I.png", "images/cat/NW_I.png")
+cat = base.Player(win, 50, 50, 5, resource_path("images/cat/N_I.png"), resource_path("images/cat/NE_I.png"), resource_path("images/cat/E_I.png"), resource_path("images/cat/SE_I.png"), resource_path("images/cat/S_I.png"), resource_path("images/cat/SW_I.png"), resource_path("images/cat/W_I.png"), resource_path("images/cat/NW_I.png"))
 
-box = base.Object(-100, -100, 200, 200, image="images/tiles/trashtree.gif", collision=False)
+box = base.Object(-100, -100, 200, 200, image=resource_path("images/tiles/trashtree.gif"), collision=False)
 box_hit = base.Object(-32, 80, 63, 20, (255, 0, 0), visible=False)
 
-GRASS = pygame.transform.scale(pygame.image.load("images/tiles/grass.png").convert(), (32, 32))
+GRASS = pygame.transform.scale(pygame.image.load(resource_path("images/tiles/grass.png")).convert(), (32, 32))
 
 
 debug = False
@@ -33,14 +44,14 @@ hitboxes = False
 
 
 debug_font = pygame.font.SysFont("ariel", 30)
-menu_font = pygame.font.Font("fonts/Eight-Bit Madness.ttf", 30)
+menu_font = pygame.font.Font(resource_path("fonts/Eight-Bit Madness.ttf"), 30)
 
 def create_server():
     name = create_name_t.text
     username = username_t.text
     data = requests.post(f"http://{SERVER_IP}:5000/create", json={"name": username, "room": name}).json()
     if data['success']:
-        global create_menu, SERVER_NAME
+        global create_menu, SERVER_NAME, Host
         create_menu = False
         create_confirm_b.visible = False
         create_confirm_b.clickable = False
@@ -48,6 +59,7 @@ def create_server():
         create_name_t.visible = False
         create_name_t.text = ""
         SERVER_NAME = name
+        Host = True
 
 def create_server_button():
     global main_menu, create_menu
@@ -58,6 +70,8 @@ def create_server_button():
     create_confirm_b.visible = True
     create_confirm_b.clickable = True
     create_name_t.visible = True
+    username_t.selected = False
+    username_t.visible = False
 
         
 def join_server():
@@ -73,6 +87,8 @@ def join_server():
         join_name_t.visible = False
         join_name_t.text = ""
         SERVER_NAME = name
+        username_t.selected = False
+        username_t.visible = False
 def join_server_button():
     global main_menu, join_menu
     main_menu = False
@@ -83,6 +99,8 @@ def join_server_button():
     join_confirm_b.clickable = True
     create_server_b.visible = False
     create_server_b.clickable = False
+    username_t.selected = False
+    username_t.visible = False
         
 def leave_server():
     name = create_name_t.text
@@ -123,17 +141,21 @@ def update():
             if player['username'] == username:
                 OTHER_PLAYERS.remove(player)
                 break
+    elif data['message'] == 'Room not found.':
+        main_menu_f(True)
+    else:
+        print("Failed to update")
 
     
-username_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+115, 200, 50, (255, 255, 255), menu_font, "Username...", image="images/textures/stone_button.png")
+username_t = base.Textbox(win.get_width()/2-100, win.get_height()/2+115, 200, 50, (255, 255, 255), menu_font, "Username...", selected_image=resource_path("images/textures/textbox/Textbox_selected.png"), unselected_image=resource_path("images/textures/textbox/Textbox_unselected.png"),)
 
-create_server_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+50, 100, 50, "Create", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=create_server_button)
-create_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+50, 200, 50, (255, 255, 255), menu_font, "Server name...", image="images/textures/stone_button.png", visible=False)
-create_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=create_server, clickable=False, visible=False)
+create_server_b = base.Button(win.get_width()/2-50, win.get_height()/2+50, 100, 50, "Create", 50, (0, 0, 0), menu_font, image=resource_path("images/textures/stone_button.png"), click=create_server_button)
+create_name_t = base.Textbox(win.get_width()/2-100, win.get_height()/2+50, 200, 50, (255, 255, 255), menu_font, "Server name...", selected_image=resource_path("images/textures/textbox/Textbox_selected.png"), unselected_image=resource_path("images/textures/textbox/Textbox_unselected.png"), visible=False)
+create_confirm_b = base.Button(win.get_width()/2-50, win.get_height()/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image=resource_path("images/textures/stone_button.png"), click=create_server, clickable=False, visible=False)
 
-join_server_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+180, 100, 50, "Join", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server_button)
-join_name_t = base.Textbox(SCREEN_SIZE[0]/2-100, SCREEN_SIZE[1]/2+50, 200, 50, (255, 255, 255), menu_font, "Server name...", image="images/textures/stone_button.png", visible=False)
-join_confirm_b = base.Button(SCREEN_SIZE[0]/2-50, SCREEN_SIZE[1]/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image="images/textures/stone_button.png", click=join_server, clickable=False, visible=False)
+join_server_b = base.Button(win.get_width()/2-50, win.get_height()/2+180, 100, 50, "Join", (255, 255, 255), (0, 0, 0), menu_font, image=resource_path("images/textures/stone_button.png"), click=join_server_button)
+join_name_t = base.Textbox(win.get_width()/2-100, win.get_height()/2+50, 200, 50, (255, 255, 255), menu_font, "Server name...", selected_image=resource_path("images/textures/textbox/Textbox_selected.png"), unselected_image=resource_path("images/textures/textbox/Textbox_unselected.png"), visible=False)
+join_confirm_b = base.Button(win.get_width()/2-50, win.get_height()/2+120, 100, 50, "Confirm", (255, 255, 255), (0, 0, 0), menu_font, image=resource_path("images/textures/stone_button.png"), click=join_server, clickable=False, visible=False)
 
 
 main_menu_f(True)
@@ -147,7 +169,10 @@ while run:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            
+            if Host:
+                requests.post(f"http://{SERVER_IP}:5000/close", json={"name": username_t.text, "room": SERVER_NAME})
+            else:
+                requests.post(f"http://{SERVER_IP}:5000/leave", json={"name": username_t.text, "room": SERVER_NAME})
             run = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F3:
@@ -171,29 +196,46 @@ while run:
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_ESCAPE]:
+        if Host:
+            requests.post(f"http://{SERVER_IP}:5000/close", json={"name": username_t.text, "room": SERVER_NAME})
+        else:
+            requests.post(f"http://{SERVER_IP}:5000/leave", json={"name": username_t.text, "room": SERVER_NAME})
         main_menu_f(True)
-        
 
     win.fill((0, 0, 0))
 
-    for y in range((SCREEN_SIZE[1]+GRASS.get_height()*2)//GRASS.get_height()):
-            for x in range((SCREEN_SIZE[0]+GRASS.get_width()*2)//GRASS.get_width()):
+    for y in range((win.get_height()+GRASS.get_height()*2)//GRASS.get_height()):
+            for x in range((win.get_width()+GRASS.get_width()*2)//GRASS.get_width()):
                 win.blit(GRASS, (x*GRASS.get_width()-(base.PLAYER[0]%GRASS.get_width()), y*GRASS.get_height()-(base.PLAYER[1]%GRASS.get_height())))
 
     if main_menu:
+        username_t.x = win.get_width()/2-100
+        username_t.y = win.get_height()/2+115
+        create_server_b.x = win.get_width()/2-50
+        create_server_b.y = win.get_height()/2+50
+        join_server_b.x = win.get_width()/2-50
+        join_server_b.y = win.get_height()/2+180
         text = menu_font.render("Cat Game", 1, (255, 255, 255))
-        win.blit(text, (SCREEN_SIZE[0]//2-text.get_width()//2, SCREEN_SIZE[1]//2-text.get_height()//2))
+        win.blit(text, (win.get_width()//2-text.get_width()//2, win.get_height()//2-text.get_height()//2))
         create_server_b.draw(win)
         join_server_b.draw(win)
         username_t.draw(win)
     elif create_menu:
+        create_name_t.x = win.get_width()/2-100
+        create_name_t.y = win.get_height()/2+50
+        create_confirm_b.x = win.get_width()/2-50
+        create_confirm_b.y = win.get_height()/2+120
         text = menu_font.render("Create Server", 1, (255, 255, 255))
-        win.blit(text, (SCREEN_SIZE[0]//2-text.get_width()//2, SCREEN_SIZE[1]//2-text.get_height()//2))
+        win.blit(text, (win.get_width()//2-text.get_width()//2, win.get_height()//2-text.get_height()//2))
         create_confirm_b.draw(win)
         create_name_t.draw(win)
     elif join_menu:
+        join_name_t.x = win.get_width()/2-100
+        join_name_t.y = win.get_height()/2+50
+        join_confirm_b.x = win.get_width()/2-50
+        join_confirm_b.y = win.get_height()/2+120
         text = menu_font.render("Join Server", 1, (255, 255, 255))
-        win.blit(text, (SCREEN_SIZE[0]//2-text.get_width()//2, SCREEN_SIZE[1]//2-text.get_height()//2))
+        win.blit(text, (win.get_width()//2-text.get_width()//2, win.get_height()//2-text.get_height()//2))
         join_confirm_b.draw(win)
         join_name_t.draw(win)
     else:
@@ -219,7 +261,7 @@ while run:
         elif keys[pygame.K_d]:
             cat.move("E", milli)
 
-        if prev_time + 0.2 < time.time():
+        if prev_time + DELAY < time.time():
             update()
             prev_time = time.time()
 

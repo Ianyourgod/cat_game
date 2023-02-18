@@ -1,4 +1,11 @@
 import pygame
+import os
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+
+def resource_path(relative_path):
+    return 'assets/' + relative_path
+
 
 def null():
     return
@@ -193,14 +200,19 @@ class Text(Object):
 
 class Textbox(Object):
     def __init__(self, x: int|float, y: int|float, width: int|float, height: int|float, text_color: tuple, font: pygame.font.Font, placeholder: str = "", unselected_color: tuple = None, selected_color: tuple=None, unselected_image: str | None = None, selected_image: str | None = None, image: str|None = None, visible: bool = True) -> None:
+        if unselected_image and selected_image:
+            image = unselected_image
         super().__init__(x, y, width, height, unselected_color, image, False, visible)
         self.text_color = text_color
         self.font = font
         self.placeholder = placeholder
         self.unselected_color = unselected_color
         self.selected_color = selected_color
-        self.unselected_image = unselected_image
-        self.selected_image = selected_image
+        self.selected_image = None
+        self.unselected_image = None
+        if selected_image and unselected_image:
+            self.unselected_image = pygame.transform.scale(pygame.image.load(unselected_image).convert_alpha(), (self.width, self.height))
+            self.selected_image = pygame.transform.scale(pygame.image.load(selected_image).convert_alpha(), (self.width, self.height))
         self.text = ""
         self.selected = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -251,10 +263,10 @@ class Textbox(Object):
 
 class OtherPlayerDrawer:
     def __init__(self):
-        self.font = pygame.font.Font("fonts/Eight-Bit Madness.ttf", 30)
+        self.font = pygame.font.Font(resource_path("fonts/Eight-Bit Madness.ttf"), 30)
 
-        N_I, NE_I, E_I, SE_I, S_I, SW_I, W_I, NW_I ="images/cat/N_I.png", "images/cat/NE_I.png", "images/cat/E_I.png", "images/cat/SE_I.png", "images/cat/S_I.png", "images/cat/SW_I.png", "images/cat/W_I.png", "images/cat/NW_I.png"
-
+        N_I, NE_I, E_I, SE_I, S_I, SW_I, W_I, NW_I = resource_path("images/cat/N_I.png"), resource_path("images/cat/NE_I.png"), resource_path("images/cat/E_I.png"), resource_path("images/cat/SE_I.png"), resource_path("images/cat/S_I.png"), resource_path("images/cat/SW_I.png"), resource_path("images/cat/W_I.png"), resource_path("images/cat/NW_I.png")
+        
         width, height = 50, 50
 
         self.N_I = pygame.transform.scale(pygame.image.load(N_I).convert_alpha(), (width, height))
@@ -287,4 +299,4 @@ class OtherPlayerDrawer:
             raise Exception("Invalid direction")
 
         text = self.font.render(name, True, (0, 0, 0))
-        win.blit(text, (x+25-text.get_width()/2, y-30))
+        win.blit(text, (x-PLAYER[0], y-30-PLAYER[1]))
