@@ -297,4 +297,4 @@ class OtherPlayerDrawer:
             raise Exception("Invalid direction")
 
         text = self.font.render(name, True, (0, 0, 0))
-        win.blit(text, (x-PLAYER[0], y-30-PLAYER[1]))
+        win.blit(text, (x-PLAYER[0]-(text.get_width()/2)+25, y-30-PLAYER[1]))
