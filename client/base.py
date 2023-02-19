@@ -1,10 +1,8 @@
 import pygame
 import os
 
-ABS_PATH = os.path.dirname(os.path.abspath(__file__))
-
 def resource_path(relative_path):
-    return 'assets/' + relative_path
+    return os.path.expanduser('~').replace("\\","/") + f"/AppData/Local/Ianyourgod/cat_game/assets/{relative_path}"
 
 
 def null():

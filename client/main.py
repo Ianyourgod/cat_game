@@ -1,14 +1,40 @@
 import pygame
+import os
+
+if not os.path.isdir(os.path.expanduser('~').replace("\\", "/") + "/AppData/Local\\Ianyourgod\\cat_game\\assets"):
+    pygame.init()
+    pygame.display.set_mode((500,500))
+    pygame.display.set_caption("ERROR")
+    win = pygame.display.get_surface()
+    font = pygame.font.SysFont("Arial", 20)
+    if not os.path.isdir(os.path.expanduser('~').replace("\\","/") + "/AppData/Local/Ianyourgod"):
+        os.mkdir(os.path.expanduser('~').replace("\\","/") + "/AppData/Local/Ianyourgod")
+        os.mkdir(os.path.expanduser('~').replace("\\","/") + "/AppData/Local/Ianyourgod/cat_game")
+    elif not os.path.isdir(os.path.expanduser('~').replace("\\","/") + "/AppData/Local/Ianyourgod/cat_game"):
+        os.mkdir(os.path.expanduser('~').replace("\\", "/") + "/AppData/Local/Ianyourgod/cat_game")
+    text = font.render(f"Could not find assets", True, (255, 0, 0))
+    text2 = font.render("Please move the assets folder to the directory", True, (255, 0, 0))
+    text3 = font.render(os.path.expanduser('~') + "/AppData/Local/Ianyourgod/cat_game", True, (255, 0, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        win.fill((0, 0, 0))
+        win.blit(text, (0, 0))
+        win.blit(text2, (0, 20))
+        win.blit(text3, (0, 40))
+        pygame.display.update()
+        
 import base
 import requests
 import time
-import os
 import socket   
 
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def resource_path(relative_path):
-    return 'assets/' + relative_path
+    return os.path.expanduser('~').replace("\\", "/") + f"/AppData/Local/Ianyourgod/cat_game/assets/{relative_path}"
 
 pygame.init()
 
@@ -169,10 +195,11 @@ while run:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            if Host:
-                requests.post(f"http://{SERVER_IP}:5000/close", json={"name": username_t.text, "room": SERVER_NAME})
-            else:
-                requests.post(f"http://{SERVER_IP}:5000/leave", json={"name": username_t.text, "room": SERVER_NAME})
+            if SERVER_NAME:
+                if Host:
+                    requests.post(f"http://{SERVER_IP}:5000/close", json={"name": username_t.text, "room": SERVER_NAME})
+                else:
+                    requests.post(f"http://{SERVER_IP}:5000/leave", json={"name": username_t.text, "room": SERVER_NAME})
             run = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F3:
