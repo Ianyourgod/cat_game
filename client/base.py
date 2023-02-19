@@ -29,6 +29,8 @@ class Object:
 
         self.color = None
         self.image = None
+        
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         if color and image:
             raise Exception("Cannot have both color and image")
@@ -162,7 +164,6 @@ class Button(Object):
         self.font = font
         self.click = click
         self.clickable = clickable
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         BUTTONS.append(self)
 
     def draw(self, win: pygame.Surface) -> None:
