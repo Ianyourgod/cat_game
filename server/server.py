@@ -1,11 +1,10 @@
-# WIP
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 rooms = []
 # room layout: {name: str, players: [player], host: sid, started: bool}
-# player layout: {username: str, x: int, y: int, direction: str}
+# player layout: {username: str, x: int, y: int, direction: str} 
 
 @app.route('/join', methods=['POST'])
 def join():
