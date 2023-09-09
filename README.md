@@ -1,3 +1,3 @@
 # cat_game
 cats :3
-eventually will be multiplayer game where you control cats n stuff
+"game" i made about controlling cats. This was basically just a multiplayer game test, and i never expanded it past 2 players and the ability to create objects.
